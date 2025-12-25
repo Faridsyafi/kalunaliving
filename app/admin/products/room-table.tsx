@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import type { produk } from "@prisma/client";
+import type { Produk } from "@prisma/client";
 
 type Props = {
-  initialproduks: produk[];
+  initialproduks: Produk[];
 };
 
 export default function produkTable({ initialproduks }: Props) {
