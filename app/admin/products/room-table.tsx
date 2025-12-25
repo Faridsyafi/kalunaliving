@@ -47,7 +47,6 @@ export default function ProdukTable({ initialproduks }: Props) {
       const newproduk: Produk = await res.json();
       setproduks((prev) => [newproduk, ...prev]);
 
-      // reset form
       setForm({
         name: "",
         description: "",
@@ -56,7 +55,6 @@ export default function ProdukTable({ initialproduks }: Props) {
       });
       setImageFile(null);
 
-      // reset nilai file input
       const fileInput = document.getElementById(
         "produk-image-input"
       ) as HTMLInputElement | null;
@@ -70,134 +68,62 @@ export default function ProdukTable({ initialproduks }: Props) {
 
   return (
     <div className="space-y-6">
-      {/* Form Tambah produk */}
       <div className="bg-white border rounded-xl shadow-sm p-4">
-        <h2 className="text-sm font-semibold mb-3">Tambah produk / Produk</h2>
+        <h2 className="text-sm font-semibold mb-3">Tambah Produk</h2>
         <form onSubmit={handleSubmit} className="grid gap-3 md:grid-cols-2">
-          <div className="flex flex-col gap-1">
-            <label className="text-xs text-gray-600">Nama produk</label>
-            <input
-              type="text"
-              className="border rounded-md px-3 py-2 text-sm"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              required
-            />
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label className="text-xs text-gray-600">Harga (Rp)</label>
-            <input
-              type="text"
-              className="border rounded-md px-3 py-2 text-sm"
-              value={form.price}
-              onChange={(e) => setForm({ ...form, price: e.target.value })}
-              placeholder="contoh: 15000 atau 15.000"
-              required
-            />
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label className="text-xs text-gray-600">Kapasitas</label>
-            <input
-              type="number"
-              className="border rounded-md px-3 py-2 text-sm"
-              value={form.capacity}
-              onChange={(e) => setForm({ ...form, capacity: e.target.value })}
-              min={1}
-            />
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label className="text-xs text-gray-600">Gambar Produk</label>
-            <input
-              id="produk-image-input"
-              type="file"
-              accept="image/*"
-              className="border rounded-md px-3 py-2 text-sm bg-white"
-              onChange={(e) =>
-                setImageFile(e.target.files?.[0] ? e.target.files[0] : null)
-              }
-            />
-            <span className="text-[11px] text-gray-500">
-              Format: JPG, PNG, dll. Disimpan di /public/uploads.
-            </span>
-          </div>
-
-          <div className="flex flex-col gap-1 md:col-span-2">
-            <label className="text-xs text-gray-600">Deskripsi</label>
-            <textarea
-              className="border rounded-md px-3 py-2 text-sm min-h-[80px]"
-              value={form.description}
-              onChange={(e) =>
-                setForm({ ...form, description: e.target.value })
-              }
-              required
-            />
-          </div>
-
+          <input
+            type="text"
+            placeholder="Nama produk"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            className="border px-3 py-2 rounded-md"
+            required
+          />
+          <input
+            type="text"
+            placeholder="Harga"
+            value={form.price}
+            onChange={(e) => setForm({ ...form, price: e.target.value })}
+            className="border px-3 py-2 rounded-md"
+            required
+          />
+          <input
+            type="number"
+            placeholder="Kapasitas"
+            value={form.capacity}
+            onChange={(e) => setForm({ ...form, capacity: e.target.value })}
+            className="border px-3 py-2 rounded-md"
+            min={1}
+          />
+          <input
+            id="produk-image-input"
+            type="file"
+            accept="image/*"
+            onChange={(e) =>
+              setImageFile(e.target.files?.[0] ?? null)
+            }
+            className="border px-3 py-2 rounded-md"
+          />
+          <textarea
+            placeholder="Deskripsi"
+            value={form.description}
+            onChange={(e) =>
+              setForm({ ...form, description: e.target.value })
+            }
+            className="border px-3 py-2 rounded-md md:col-span-2"
+            required
+          />
           {error && (
-            <div className="md:col-span-2 text-xs text-red-500">{error}</div>
+            <div className="md:col-span-2 text-sm text-red-500">{error}</div>
           )}
-
-          <div className="md:col-span-2 flex justify-end">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="px-4 py-2 bg-orange-500 text-white text-sm rounded-md hover:bg-orange-600 disabled:opacity-60"
-            >
-              {isSubmitting ? "Menyimpan..." : "Simpan produk"}
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="md:col-span-2 bg-orange-500 text-white py-2 rounded-md"
+          >
+            {isSubmitting ? "Menyimpan..." : "Simpan Produk"}
+          </button>
         </form>
-      </div>
-
-      {/* Tabel produk */}
-      <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
-        <div className="px-4 py-3 border-b flex items-center justify-between">
-          <h2 className="text-sm font-semibold">Daftar produk</h2>
-          <span className="text-xs text-gray-500">
-            Total: {produks.length} produk
-          </span>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-sm">
-            <thead className="bg-gray-50 border-b">
-              <tr>
-                <th className="px-4 py-2 text-left">Nama</th>
-                <th className="px-4 py-2 text-left">Harga</th>
-                <th className="px-4 py-2 text-left">Kapasitas</th>
-                <th className="px-4 py-2 text-left">Dibuat</th>
-              </tr>
-            </thead>
-            <tbody>
-              {produks.length === 0 && (
-                <tr>
-                  <td
-                    colSpan={4}
-                    className="px-4 py-6 text-center text-gray-500"
-                  >
-                    Belum ada produk.
-                  </td>
-                </tr>
-              )}
-
-              {produks.map((produk) => (
-                <tr key={produk.id} className="border-b last:border-0">
-                  <td className="px-4 py-2">{produk.name}</td>
-                  <td className="px-4 py-2">
-                    Rp {produk.price.toLocaleString("id-ID")}
-                  </td>
-                  <td className="px-4 py-2">{produk.capacity}</td>
-                  <td className="px-4 py-2">
-                    {produk.createdAt.toLocaleDateString("id-ID")}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
       </div>
     </div>
   );
