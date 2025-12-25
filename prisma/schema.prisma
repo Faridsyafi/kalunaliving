@@ -1,0 +1,209 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  OWNER
+  CUSTOMER
+}
+
+/**
+ * PRODUK (pakai tabel `room`)
+ */
+model Produk {
+  id          String           @id @default(cuid())
+  name        String
+  description String           @db.Text
+  image       String
+  price       Int
+  capacity    Int              @default(1)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  amenities   ProdukAmenities[]
+  reservations Reservation[]
+  cartItems   CartItem[]
+
+  @@map("room") // ====== PENTING: pakai tabel `room`
+}
+
+/**
+ * AMENITIES (pakai tabel `amenities`)
+ */
+model Amenities {
+  id              String            @id @default(cuid())
+  name            String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  produkAmenities ProdukAmenities[]
+
+  @@map("amenities")
+}
+
+/**
+ * RELASI PRODUK ↔ AMENITIES (pakai tabel `roomamenities`)
+ */
+model ProdukAmenities {
+  id          String     @id @default(cuid())
+
+  produkId    String     @map("roomId")
+  produk      Produk     @relation(fields: [produkId], references: [id], onDelete: Cascade)
+
+  amenitiesId String
+  amenities   Amenities  @relation(fields: [amenitiesId], references: [id], onDelete: Cascade)
+
+  @@map("roomamenities")
+}
+
+/**
+ * RESERVATION (pakai tabel `reservation`)
+ * kolom `roomId` di DB dipetakan ke field `produkId` di Prisma
+ */
+model Reservation {
+  id        String    @id @default(cuid())
+  starDate  DateTime
+  endDate   DateTime
+  price     Int
+
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  produkId  String    @map("roomId")
+  produk    Produk    @relation(fields: [produkId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  payment   Payment?
+
+  @@map("reservation")
+}
+
+/**
+ * PAYMENT (pakai tabel `payment`)
+ */
+model Payment {
+  id            String       @id @default(cuid())
+  method        String?
+  amount        Int
+  status        String       @default("unpaid")
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  reservationId String       @unique
+  reservation   Reservation  @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+
+  @@map("payment")
+}
+
+/**
+ * USER (pakai tabel `user`)
+ */
+model User {
+  id            String               @id @default(cuid())
+  name          String?
+  email         String?              @unique
+  username      String               @unique
+  password      String
+  emailVerified DateTime?
+  image         String?
+  role          Role                 @default(CUSTOMER)
+  phone         String?
+
+  accounts      Account[]
+  reservations  Reservation[]
+  carts         Cart[]
+
+  passwordResetTokens PasswordResetToken[]
+
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+
+  @@map("user")
+}
+
+/**
+ * ACCOUNT (pakai tabel `account`)
+ */
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+  @@map("account")
+}
+
+/**
+ * CART (pakai tabel `cart`)
+ */
+model Cart {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  items     CartItem[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("cart")
+}
+
+/**
+ * CART ITEM (pakai tabel `cartitem`)
+ * kolom `roomId` di DB dipetakan ke field `produkId`
+ */
+model CartItem {
+  id        String   @id @default(cuid())
+
+  cartId    String
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+  produkId  String   @map("roomId")
+  produk    Produk   @relation(fields: [produkId], references: [id], onDelete: Cascade)
+
+  quantity  Int      @default(1)
+  price     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([cartId, produkId])
+  @@map("cartitem")
+}
+
+/**
+ * PASSWORD RESET TOKEN (pakai tabel `passwordresettoken`)
+ */
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  expires   DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expires])
+  @@map("passwordresettoken")
+}
