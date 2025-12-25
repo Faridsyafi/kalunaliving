@@ -103,3 +103,22 @@ export const getReservationByUserId = async (userId: string) => {
     return [];
   }
 };
+
+// === FUNCTION: getReservationById ===
+export const getReservationById = async (id: string) => {
+  try {
+    const reservation = await prisma.reservation.findUnique({
+      where: { id },
+      include: {
+        user: true,
+        produk: true,
+        payment: true,
+      },
+    });
+
+    return reservation;
+  } catch (err) {
+    console.error("Error getReservationById:", err);
+    return null;
+  }
+};
