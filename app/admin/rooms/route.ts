@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
     const imageUrl = `/uploads/${filename}`;
     // ------------------------------
 
-    const Produk = await prisma.Produk.create({
+    const produk = await prisma.Produk.create({
       data: {
         name,
         description,
