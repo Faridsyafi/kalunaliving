@@ -14,7 +14,7 @@ const ReservationDetail = async ({
   return (
     <div className="w-full p-4 bg-white border border-gray-200 rounded-sm shadow">
       <div className="grid md:grid-cols-2 md:gap-5">
-        <ul className="">
+        <ul>
           <li className="py-2">
             <div className="flex items-center">
               <div className="flex-1 min-w-0 ms-4">
@@ -27,6 +27,7 @@ const ReservationDetail = async ({
               </div>
             </div>
           </li>
+
           <li className="py-2">
             <div className="flex items-center">
               <div className="flex-1 min-w-0 ms-4">
@@ -39,6 +40,7 @@ const ReservationDetail = async ({
               </div>
             </div>
           </li>
+
           <li className="py-2">
             <div className="flex items-center">
               <div className="flex-1 min-w-0 ms-4">
@@ -47,10 +49,11 @@ const ReservationDetail = async ({
                 </p>
               </div>
               <div className="inline-flex items-center text-base font-semibold text-gray-900">
-                {reservation.User.name}
+                {reservation.user?.name ?? "-"}
               </div>
             </div>
           </li>
+
           <li className="py-2">
             <div className="flex items-center">
               <div className="flex-1 min-w-0 ms-4">
@@ -59,12 +62,13 @@ const ReservationDetail = async ({
                 </p>
               </div>
               <div className="inline-flex items-center text-base font-semibold text-gray-900">
-                {reservation.User.email}
+                {reservation.user?.email ?? "-"}
               </div>
             </div>
           </li>
         </ul>
-        <ul className="">
+
+        <ul>
           <li className="py-2">
             <div className="flex items-center">
               <div className="flex-1 min-w-0 ms-4">
@@ -73,10 +77,11 @@ const ReservationDetail = async ({
                 </p>
               </div>
               <div className="inline-flex items-center text-base font-semibold text-gray-900">
-                {reservation.User.phone}
+                {reservation.user?.phone ?? "-"}
               </div>
             </div>
           </li>
+
           <li className="py-2">
             <div className="flex items-center">
               <div className="flex-1 min-w-0 ms-4">
@@ -85,12 +90,13 @@ const ReservationDetail = async ({
                 </p>
               </div>
               <div className="inline-flex items-center text-base font-semibold text-gray-900 capitalize">
-                {reservation.Payment?.method
-                  ? reservation.Payment?.method.replace("_", " ")
-                  : null}
+                {reservation.payment?.method
+                  ? reservation.payment.method.replaceAll("_", " ")
+                  : "-"}
               </div>
             </div>
           </li>
+
           <li className="py-2">
             <div className="flex items-center">
               <div className="flex-1 min-w-0 ms-4">
@@ -98,13 +104,14 @@ const ReservationDetail = async ({
                   Payment Status
                 </p>
               </div>
-              <div className="inline-flex items-center text-base font-semibold text-gray-900u uppercase">
-                {reservation.Payment?.status}
+              <div className="inline-flex items-center text-base font-semibold text-gray-900 uppercase">
+                {reservation.payment?.status ?? "-"}
               </div>
             </div>
           </li>
         </ul>
       </div>
+
       {/* Table */}
       <div className="relative overflow-x-auto mt-3 py-6">
         <table className="w-full text-sm text-left text-gray-500">
@@ -127,35 +134,43 @@ const ReservationDetail = async ({
               </th>
             </tr>
           </thead>
+
           <tbody>
             <tr className="bg-white border-b dark:bg-gray-800">
               <td scope="row" className="px-6 py-4">
                 <div className="flex flex-col">
                   <span className="font-medium text-gray-900 whitespace-nowrap">
-                    {reservation.produk.name}
+                    {reservation.produk?.name ?? "-"}
                   </span>
-                  <span>Price: {formatCurrency(reservation.produk.price)}</span>
+                  <span>
+                    Price:{" "}
+                    {reservation.produk?.price
+                      ? formatCurrency(reservation.produk.price)
+                      : "-"}
+                  </span>
                 </div>
               </td>
+
               <td className="px-6 py-4">
                 {formatDate(reservation.starDate.toISOString())}
               </td>
               <td className="px-6 py-4">
                 {formatDate(reservation.endDate.toISOString())}
               </td>
+
               <td className="px-6 py-4">
-                {differenceInCalendarDays(
-                  reservation.endDate,
-                  reservation.starDate
-                )}{" "}
+                {differenceInCalendarDays(reservation.endDate, reservation.starDate)}{" "}
                 Night
               </td>
+
               <td className="px-6 py-4 text-right">
-                {reservation.Payment &&
-                  formatCurrency(reservation.Payment.amount)}
+                {reservation.payment?.amount
+                  ? formatCurrency(reservation.payment.amount)
+                  : "-"}
               </td>
             </tr>
           </tbody>
+
           <tfoot>
             <tr>
               <td scope="col" className="px-6 py-3 font-bold" colSpan={2}>
@@ -166,14 +181,14 @@ const ReservationDetail = async ({
                 className="px-6 py-3 text-right font-bold"
                 colSpan={3}
               >
-                {reservation.Payment &&
-                  formatCurrency(reservation.Payment.amount)}
+                {reservation.payment?.amount
+                  ? formatCurrency(reservation.payment.amount)
+                  : "-"}
               </td>
             </tr>
           </tfoot>
         </table>
       </div>
-
       {/* end table */}
     </div>
   );
