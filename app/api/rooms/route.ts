@@ -1,4 +1,4 @@
-// app/api/admin/Produks/route.ts
+// app/api/admin/produks/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
@@ -9,15 +9,15 @@ export const runtime = "nodejs";
 
 export async function GET() {
   try {
-    const Produks = await prisma.Produk.findMany({
+    const produks = await prisma.produk.findMany({
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json(Produks);
+    return NextResponse.json(produks);
   } catch (error) {
-    console.error("GET /api/admin/Produks error:", error);
+    console.error("GET /api/admin/produks error:", error);
     return NextResponse.json(
-      { message: "Gagal mengambil data Produk" },
+      { message: "Gagal mengambil data produk" },
       { status: 500 }
     );
   }
@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
       ? Math.max(1, Number.parseInt(capacityRaw, 10) || 1)
       : 1;
 
-    let imagePath = "/uploads/default-Produk.jpg";
+    let imagePath = "/uploads/default-produk.jpg";
 
     if (file && file.size > 0) {
       const bytes = await file.arrayBuffer();
@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
       imagePath = `/uploads/${fileName}`;
     }
 
-    const Produk = await prisma.Produk.create({
+    const produk = await prisma.produk.create({
       data: {
         name,
         description,
@@ -91,11 +91,11 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json(Produk, { status: 201 });
+    return NextResponse.json(produk, { status: 201 });
   } catch (error: any) {
-    console.error("POST /api/admin/Produks error:", error);
+    console.error("POST /api/admin/produks error:", error);
     return NextResponse.json(
-      { message: error?.message || "Gagal menambahkan Produk" },
+      { message: error?.message || "Gagal menambahkan produk" },
       { status: 500 }
     );
   }
