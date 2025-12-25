@@ -37,6 +37,7 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
+
     const body = await req.json();
 
     const produk = await prisma.produk.update({
