@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import type { Produk } from "@prisma/client";
 
 type Props = {
   initialproduks: Produk[];
 };
 
-export default function produkTable({ initialproduks }: Props) {
-  const [produks, setproduks] = useState<produk[]>(initialproduks);
+export default function ProdukTable({ initialproduks }: Props) {
+  const [produks, setproduks] = useState<Produk[]>(initialproduks);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({
     name: "",
@@ -19,7 +19,7 @@ export default function produkTable({ initialproduks }: Props) {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
@@ -40,11 +40,11 @@ export default function produkTable({ initialproduks }: Props) {
       });
 
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
+        const data = await res.json().catch(() => ({} as any));
         throw new Error(data.message || "Gagal menambahkan produk");
       }
 
-      const newproduk: produk = await res.json();
+      const newproduk: Produk = await res.json();
       setproduks((prev) => [newproduk, ...prev]);
 
       // reset form
@@ -55,13 +55,14 @@ export default function produkTable({ initialproduks }: Props) {
         capacity: "1",
       });
       setImageFile(null);
+
       // reset nilai file input
       const fileInput = document.getElementById(
         "produk-image-input"
       ) as HTMLInputElement | null;
       if (fileInput) fileInput.value = "";
     } catch (err: any) {
-      setError(err.message || "Terjadi kesalahan");
+      setError(err?.message || "Terjadi kesalahan");
     } finally {
       setIsSubmitting(false);
     }
