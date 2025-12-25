@@ -23,21 +23,21 @@ const MyReservationList = async ({
             <div className="flex gap-1 px-3 py-2 text-sm font-normal">
               <span>Status:</span>
               <span className="font-bold uppercase">
-                {item.Payment?.status}
+                {item.payment?.status ?? "-"}
               </span>
             </div>
           </div>
+
           <div
-            key={item.id}
             className="flex flex-col mb-4 items-start bg-white rounded-sm md:flex-row md:w-full"
           >
-              <Image
+            <Image
               src={
                 item.produk?.image
                   ? item.produk.image.startsWith("http")
-                    ? item.produk.image                          // untuk URL external
-                    : `/${item.produk.image}`                    // untuk local file
-                  : "/hero.jpg"                                // fallback default
+                    ? item.produk.image // untuk URL external
+                    : `/${item.produk.image}` // untuk local file
+                  : "/hero.jpg" // fallback default
               }
               width={500}
               height={300}
@@ -47,22 +47,30 @@ const MyReservationList = async ({
 
             <div className="flex flex-col justify-between p-4 leading-normal w-full">
               <h5 className="mb-1 text-2xl font-bold tracking-tight text-gray-90">
-                {item.produk.name}
+                {item.produk?.name ?? "-"}
               </h5>
+
               <div className="flex items-center gap-1 mb-3 font-normal text-gray-700">
                 <div className="w-full">
                   <div className="flex items-center justify-between text-sm font-medium text-gray-900 truncate">
                     <span>Price</span>
-                    <span>{formatCurrency(item.produk.price)}</span>
+                    <span>
+                      {item.produk?.price != null
+                        ? formatCurrency(item.produk.price)
+                        : "-"}
+                    </span>
                   </div>
+
                   <div className="flex items-center justify-between text-sm font-medium text-gray-900 truncate">
                     <span className="truncate">Expected Arrival</span>
                     <span>{formatDate(item.starDate.toISOString())}</span>
                   </div>
+
                   <div className="flex items-center justify-between text-sm font-medium text-gray-900 truncate">
                     <span className="truncate">Expected Departure</span>
                     <span>{formatDate(item.endDate.toISOString())}</span>
                   </div>
+
                   <div className="flex items-center justify-between text-sm font-medium text-gray-900 truncate">
                     <span>Duration</span>
                     <span>
@@ -70,10 +78,13 @@ const MyReservationList = async ({
                       <span className="ml-1">Night</span>
                     </span>
                   </div>
+
                   <div className="flex items-center justify-between text-sm font-medium text-gray-900 truncate">
                     <span>Sub Total</span>
                     <span>
-                      {item.Payment && formatCurrency(item.Payment?.amount)}
+                      {item.payment?.amount != null
+                        ? formatCurrency(item.payment.amount)
+                        : "-"}
                     </span>
                   </div>
                 </div>
@@ -81,8 +92,9 @@ const MyReservationList = async ({
               {/* button detail */}
             </div>
           </div>
+
           <div className="flex items-end justify-end absolute inset-4">
-            {item.Payment?.status === "unpaid" ? (
+            {item.payment?.status === "unpaid" ? (
               <Link
                 href={`/checkout/${item.id}`}
                 className="px-6 py-1 bg-orange-400 text-white rounded-md hover:bg-orange-500"
