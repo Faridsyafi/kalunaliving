@@ -89,7 +89,6 @@ export const getReservationByUserId = async (userId: string) => {
     const reservations = await prisma.reservation.findMany({
       where: { userId },
       include: {
-        // sesuai saran TypeScript: pakai 'produk' (R besar)
         produk: true,
       },
       orderBy: {
