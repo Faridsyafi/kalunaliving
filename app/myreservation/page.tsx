@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 const MyOrder = async () => {
   const session = await auth();
   if (!session || !session.user || !session?.user?.id) redirect("/signin");
-  const reservation = await getReservationByUserId();
+  const reservation = await getReservationByUserId(session.user.id);
   console.log(reservation);
   if (!reservation?.length)
     return (
