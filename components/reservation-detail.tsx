@@ -154,6 +154,7 @@ const ReservationDetail = async ({
               <td className="px-6 py-4">
                 {formatDate(reservation.starDate.toISOString())}
               </td>
+
               <td className="px-6 py-4">
                 {formatDate(reservation.endDate.toISOString())}
               </td>
