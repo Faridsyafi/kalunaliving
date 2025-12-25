@@ -10,10 +10,18 @@ export const metadata: Metadata = {
 
 const MyOrder = async () => {
   const session = await auth();
-  if (!session || !session.user || !session?.user?.id) redirect("/signin");
-  const reservation = await getReservationByUserId(session.user.id);
-  console.log(reservation);
-  if (!reservation?.length)
+
+  // pastikan user login
+  if (!session || !session.user || !session.user.id) {
+    redirect("/signin");
+  }
+
+  // ✅ kirim userId ke function (WAJIB)
+  const reservation = await getReservationByUserId(
+    session.user.id as string
+  );
+
+  if (!reservation || reservation.length === 0) {
     return (
       <div className="min-h-screen bg-slate-50">
         <div className="max-w-screen-lg mx-auto mt-10 py-20 px-4">
@@ -21,6 +29,7 @@ const MyOrder = async () => {
         </div>
       </div>
     );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -35,6 +44,7 @@ const MyOrder = async () => {
             </p>
           </div>
         </div>
+
         <div className="rounded-sm">
           <MyReservationList reservation={reservation} />
         </div>
