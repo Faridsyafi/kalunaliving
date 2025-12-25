@@ -12,7 +12,6 @@ export async function POST(
       where: { id },
     });
 
-    // Redirect ke daftar produk setelah berhasil hapus
     return NextResponse.redirect(new URL("/admin/products", req.url));
   } catch (err) {
     console.error(err);
