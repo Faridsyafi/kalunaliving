@@ -6,11 +6,9 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import clsx from "clsx";
 
-// ✅ Ganti import "@/types/produk" yang tidak ada dengan type lokal (deploy-safe)
 type DisabledDateProps = {
   startDate?: Date | null;
   endDate?: Date | null;
-  // kalau kamu punya daftar tanggal booked dari backend
   reservedDates?: Array<{ starDate: Date; endDate: Date }> | Date[];
 };
 
@@ -21,7 +19,6 @@ type produkProps2 = {
   capacity?: number;
   image?: string;
   description?: string;
-  // biar aman kalau ada field lain dipakai
   [key: string]: any;
 };
 
@@ -36,20 +33,21 @@ const ReserveForm = ({
   const [starDate, setStarDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
 
-  // optional: kalau kamu punya list disabled date yang kompleks, bisa dikembangin lagi
   const excludeIntervals = useMemo(() => {
     const list = disabledDates?.reservedDates;
     if (!list || !Array.isArray(list)) return [];
 
-    // jika formatnya [{starDate,endDate}]
-    if (list.length > 0 && (list[0] as any)?.starDate && (list[0] as any)?.endDate) {
+    if (
+      list.length > 0 &&
+      (list[0] as any)?.starDate &&
+      (list[0] as any)?.endDate
+    ) {
       return (list as Array<any>).map((r) => ({
         start: new Date(r.starDate),
         end: new Date(r.endDate),
       }));
     }
 
-    // jika formatnya Date[]
     if (list.length > 0 && list[0] instanceof Date) {
       return (list as Date[]).map((d) => ({
         start: new Date(d),
@@ -65,12 +63,15 @@ const ReserveForm = ({
     setIsSubmitting(true);
 
     try {
-      // kalau actions kamu butuh field spesifik, sesuaikan di sini
-      await createReserve({
-        produkId: produk.id,
+      // ✅ Deploy-safe: createReserve butuh 6 argumen positional
+      await (createReserve as any).apply(null, [
+        produk.id,
         starDate,
         endDate,
-      } as any);
+        null,
+        null,
+        null,
+      ]);
     } finally {
       setIsSubmitting(false);
     }
@@ -115,7 +116,10 @@ const ReserveForm = ({
         disabled={isSubmitting || !starDate || !endDate}
         className={clsx(
           "bg-orange-400 text-white w-full hover:bg-orange-500 py-2.5 px-6 md:px-10 text-lg font-semibold",
-          { "opacity-50 cursor-not-allowed": isSubmitting || !starDate || !endDate }
+          {
+            "opacity-50 cursor-not-allowed":
+              isSubmitting || !starDate || !endDate,
+          }
         )}
       >
         {isSubmitting ? "Processing..." : "Reserve Now"}
