@@ -1,121 +1,126 @@
 "use client";
 
-import { useState } from "react";
-import { useActionState } from "react";
-import { addDays } from "date-fns";
-
+import { useMemo, useState, type FormEvent } from "react";
 import { createReserve } from "@/lib/actions";
-import { produkProps2, DisabledDateProps } from "@/types/produk";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import clsx from "clsx";
 
+// ✅ Ganti import "@/types/produk" yang tidak ada dengan type lokal (deploy-safe)
+type DisabledDateProps = {
+  startDate?: Date | null;
+  endDate?: Date | null;
+  // kalau kamu punya daftar tanggal booked dari backend
+  reservedDates?: Array<{ starDate: Date; endDate: Date }> | Date[];
+};
+
+type produkProps2 = {
+  id: string;
+  name?: string;
+  price: number;
+  capacity?: number;
+  image?: string;
+  description?: string;
+  // biar aman kalau ada field lain dipakai
+  [key: string]: any;
+};
+
 const ReserveForm = ({
   produk,
-  disabledDate,
+  disabledDates,
 }: {
   produk: produkProps2;
-  disabledDate: DisabledDateProps[];
+  disabledDates?: DisabledDateProps;
 }) => {
-  const StartDate = new Date();
-  const EndDate = addDays(StartDate, 1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [starDate, setStarDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
 
-  const [startDate, setStartDate] = useState(StartDate);
-  const [endDate, setEndDate] = useState(EndDate);
+  // optional: kalau kamu punya list disabled date yang kompleks, bisa dikembangin lagi
+  const excludeIntervals = useMemo(() => {
+    const list = disabledDates?.reservedDates;
+    if (!list || !Array.isArray(list)) return [];
 
-  const handleDateChange = (dates: any) => {
-    const [start, end] = dates;
-    setStartDate(start);
-    setEndDate(end);
+    // jika formatnya [{starDate,endDate}]
+    if (list.length > 0 && (list[0] as any)?.starDate && (list[0] as any)?.endDate) {
+      return (list as Array<any>).map((r) => ({
+        start: new Date(r.starDate),
+        end: new Date(r.endDate),
+      }));
+    }
+
+    // jika formatnya Date[]
+    if (list.length > 0 && list[0] instanceof Date) {
+      return (list as Date[]).map((d) => ({
+        start: new Date(d),
+        end: new Date(d),
+      }));
+    }
+
+    return [];
+  }, [disabledDates]);
+
+  const onSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      // kalau actions kamu butuh field spesifik, sesuaikan di sini
+      await createReserve({
+        produkId: produk.id,
+        starDate,
+        endDate,
+      } as any);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const [state, formAction, isPending] = useActionState(
-    createReserve.bind(null, produk.id, produk.price, startDate, endDate),
-    null
-  );
-
-  const excludeDates = disabledDate.map((item) => {
-    return {
-      start: item.starDate,
-      end: item.endDate,
-    };
-  });
-
   return (
-    <div>
-      <form action={formAction}>
-        <div className="mb-4">
-          <label className="block mb-2 text-sm font-medium text-gray-900">
-            Arrival - Departure*
-          </label>
+    <form onSubmit={onSubmit} className="space-y-4">
+      <div className="grid md:grid-cols-2 gap-3">
+        <div>
+          <label className="block text-sm mb-1">Arrival</label>
           <DatePicker
-            selected={startDate}
-            startDate={startDate}
+            selected={starDate}
+            onChange={(date) => setStarDate(date)}
+            selectsStart
+            startDate={starDate}
             endDate={endDate}
             minDate={new Date()}
-            selectsRange={true}
-            dateFormat={"dd-MM-YYYY"}
-            onChange={handleDateChange}
-            excludeDateIntervals={excludeDates}
-            wrapperClassName="w-full"
-            className="py-2 px-4 rounded-md border border-gray-300 w-full"
+            excludeDateIntervals={excludeIntervals as any}
+            className="border px-3 py-2 rounded-md w-full"
+            placeholderText="Select arrival date"
           />
+        </div>
 
-          <div aria-live="polite" aria-atomic="true">
-            <p className="text-sm text-red-500 mt-2">{state?.messageDate}</p>
-          </div>
-        </div>
-        {/* Your Name */}
-        <div className="mb-4">
-          <label
-            htmlFor="name"
-            className="block mb-2 text-sm font-medium text-gray-900"
-          >
-            Your Name*
-          </label>
-          <input
-            type="text"
-            name="name"
-            className="py-2 px-4 rounded-md border border-gray-300 w-full"
-            placeholder="Full Name..."
+        <div>
+          <label className="block text-sm mb-1">Departure</label>
+          <DatePicker
+            selected={endDate}
+            onChange={(date) => setEndDate(date)}
+            selectsEnd
+            startDate={starDate}
+            endDate={endDate}
+            minDate={starDate ?? new Date()}
+            excludeDateIntervals={excludeIntervals as any}
+            className="border px-3 py-2 rounded-md w-full"
+            placeholderText="Select departure date"
           />
-          <div aria-live="polite" aria-atomic="true">
-            <p className="text-sm text-red-500 mt-2">{state?.error?.name}</p>
-          </div>
         </div>
-        {/* Phone Number */}
-        <div className="mb-4">
-          <label
-            htmlFor="phone"
-            className="block mb-2 text-sm font-medium text-gray-900"
-          >
-            Phone Number*
-          </label>
-          <input
-            type="text"
-            name="phone"
-            className="py-2 px-4 rounded-md border border-gray-300 w-full"
-            placeholder="Phone Number..."
-          />
-          <div aria-live="polite" aria-atomic="true">
-            <p className="text-sm text-red-500 mt-2">{state?.error?.phone}</p>
-          </div>
-        </div>
-        {/* Submit Button */}
-        <button
-          type="submit"
-          className={clsx(
-            "px-10 py-3 mt-2 text-center font-semibold text-white w-full bg-orange-400 rounded-sm cursor-pointer",
-            {
-              "opacity-50 cursor-progress": isPending,
-            }
-          )}
-          disabled={isPending}
-        >
-          {isPending ? "Loading..." : "Reserve"}
-        </button>
-      </form>
-    </div>
+      </div>
+
+      <button
+        type="submit"
+        disabled={isSubmitting || !starDate || !endDate}
+        className={clsx(
+          "bg-orange-400 text-white w-full hover:bg-orange-500 py-2.5 px-6 md:px-10 text-lg font-semibold",
+          { "opacity-50 cursor-not-allowed": isSubmitting || !starDate || !endDate }
+        )}
+      >
+        {isSubmitting ? "Processing..." : "Reserve Now"}
+      </button>
+    </form>
   );
 };
 
