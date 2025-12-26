@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
-type ProdukItem = {
+type produkItem = {
   id: string;
   name: string;
   price: number;
@@ -16,14 +16,14 @@ type ProdukItem = {
 };
 
 export default function AdminProductsPage() {
-  const [produks, setProduks] = useState<ProdukItem[]>([]);
+  const [produks, setproduks] = useState<produkItem[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
   // Ambil data produk saat halaman load
   useEffect(() => {
-    const fetchProduks = async () => {
+    const fetchproduks = async () => {
       try {
         const res = await fetch("/api/admin/produks");
 
@@ -42,7 +42,7 @@ export default function AdminProductsPage() {
         }
 
         if (Array.isArray(data)) {
-          setProduks(data as ProdukItem[]);
+          setproduks(data as produkItem[]);
         } else {
           throw new Error("Format data produk tidak sesuai");
         }
@@ -56,7 +56,7 @@ export default function AdminProductsPage() {
       }
     };
 
-    fetchProduks();
+    fetchproduks();
   }, []);
 
   // Submit form tambah produk
@@ -100,11 +100,11 @@ export default function AdminProductsPage() {
       }
 
       if (data && typeof data === "object") {
-        setProduks((prev) => [data as ProdukItem, ...prev]);
+        setproduks((prev) => [data as produkItem, ...prev]);
       }
 
       form.reset();
-      setSuccess("Produk berhasil disimpan.");
+      setSuccess("produk berhasil disimpan.");
     } catch (error) {
       console.error(error);
       if (error instanceof Error) {
@@ -119,7 +119,7 @@ export default function AdminProductsPage() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
-      <h1 className="text-2xl font-semibold mb-4">Admin - Produk</h1>
+      <h1 className="text-2xl font-semibold mb-4">Admin - produk</h1>
 
       {/* Alert */}
       {error && (
@@ -133,11 +133,11 @@ export default function AdminProductsPage() {
         </div>
       )}
 
-      {/* FORM TAMBAH PRODUK */}
+      {/* FORM TAMBAH produk */}
       <form onSubmit={handleSubmit} className="space-y-4 mb-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block mb-1 text-sm font-medium">Nama Produk</label>
+            <label className="block mb-1 text-sm font-medium">Nama produk</label>
             <input
               name="name"
               type="text"
@@ -200,12 +200,12 @@ export default function AdminProductsPage() {
           disabled={isSubmitting}
           className="bg-black text-white px-4 py-2 rounded text-sm font-medium disabled:opacity-60"
         >
-          {isSubmitting ? "Menyimpan..." : "Simpan Produk"}
+          {isSubmitting ? "Menyimpan..." : "Simpan produk"}
         </button>
       </form>
 
-      {/* DAFTAR PRODUK */}
-      <h2 className="text-lg font-semibold mb-2">Daftar Produk</h2>
+      {/* DAFTAR produk */}
+      <h2 className="text-lg font-semibold mb-2">Daftar produk</h2>
 
       {produks.length === 0 ? (
         <p className="text-sm text-gray-500">Belum ada produk.</p>
