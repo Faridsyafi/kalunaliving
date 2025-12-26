@@ -1,4 +1,3 @@
-// auth.ts
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
@@ -7,13 +6,9 @@ import { prisma } from "@/lib/prisma";
 type Role = "ADMIN" | "OWNER" | "CUSTOMER";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  session: {
-    strategy: "jwt",
-  },
+  session: { strategy: "jwt" },
 
-  pages: {
-    signIn: "/signin",
-  },
+  pages: { signIn: "/signin" },
 
   providers: [
     Credentials({
@@ -22,8 +17,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         username: { label: "Username", type: "text" },
         password: { label: "Password", type: "password" },
       },
+
       async authorize(credentials) {
-        // ✅ paksa jadi string agar tidak terbaca "{}" oleh TypeScript
         const username = String(credentials?.username ?? "");
         const password = String(credentials?.password ?? "");
 
@@ -40,7 +35,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
 
         const isValid = await bcrypt.compare(password, user.password);
-
         if (!isValid) {
           throw new Error("Username atau password salah");
         }
@@ -52,7 +46,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           name: user.name ?? user.username,
           email: user.email,
           username: user.username,
-          role, // "ADMIN" | "OWNER" | "CUSTOMER"
+          role,
         };
       },
     }),
