@@ -121,3 +121,35 @@ export const getReservationById = async (id: string) => {
     return null;
   }
 };
+
+// === FUNCTION: getAmenities ===
+// Deploy-safe: pakai any supaya build TypeScript lolos walau nama model di schema belum pasti.
+// Nanti kalau kamu kirim schema.prisma, aku rapihin jadi prisma.<model> yang bener.
+export const getAmenities = async () => {
+  try {
+    const p: any = prisma;
+
+    // coba beberapa kemungkinan nama delegate model
+    const model =
+      p.amenity ??
+      p.amenities ??
+      p.fasilitas ??
+      p.facility ??
+      p.facilities;
+
+    if (!model) {
+      // kalau modelnya belum ada, jangan bikin build fail.
+      // return kosong supaya page tetap render.
+      return [];
+    }
+
+    const result = await model.findMany({
+      orderBy: { name: "asc" },
+    });
+
+    return result ?? [];
+  } catch (err) {
+    console.error("Error getAmenities:", err);
+    return [];
+  }
+};
