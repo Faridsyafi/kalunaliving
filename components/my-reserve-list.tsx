@@ -28,16 +28,14 @@ const MyReservationList = async ({
             </div>
           </div>
 
-          <div
-            className="flex flex-col mb-4 items-start bg-white rounded-sm md:flex-row md:w-full"
-          >
+          <div className="flex flex-col mb-4 items-start bg-white rounded-sm md:flex-row md:w-full">
             <Image
               src={
                 item.produk?.image
                   ? item.produk.image.startsWith("http")
-                    ? item.produk.image // untuk URL external
-                    : `/${item.produk.image}` // untuk local file
-                  : "/hero.jpg" // fallback default
+                    ? item.produk.image
+                    : `/${item.produk.image}`
+                  : "/hero.jpg"
               }
               width={500}
               height={300}
@@ -47,18 +45,14 @@ const MyReservationList = async ({
 
             <div className="flex flex-col justify-between p-4 leading-normal w-full">
               <h5 className="mb-1 text-2xl font-bold tracking-tight text-gray-90">
-                {item.produk?.name ?? "-"}
+                {item.produk?.name}
               </h5>
 
               <div className="flex items-center gap-1 mb-3 font-normal text-gray-700">
                 <div className="w-full">
                   <div className="flex items-center justify-between text-sm font-medium text-gray-900 truncate">
                     <span>Price</span>
-                    <span>
-                      {item.produk?.price != null
-                        ? formatCurrency(item.produk.price)
-                        : "-"}
-                    </span>
+                    <span>{formatCurrency(item.produk?.price ?? 0)}</span>
                   </div>
 
                   <div className="flex items-center justify-between text-sm font-medium text-gray-900 truncate">
@@ -82,9 +76,7 @@ const MyReservationList = async ({
                   <div className="flex items-center justify-between text-sm font-medium text-gray-900 truncate">
                     <span>Sub Total</span>
                     <span>
-                      {item.payment?.amount != null
-                        ? formatCurrency(item.payment.amount)
-                        : "-"}
+                      {item.payment ? formatCurrency(item.payment.amount) : "-"}
                     </span>
                   </div>
                 </div>
