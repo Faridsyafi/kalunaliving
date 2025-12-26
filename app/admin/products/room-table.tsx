@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import type { Produk } from "@prisma/client";
+import type { produk } from "@prisma/client";
 
 type Props = {
-  initialproduks: Produk[];
+  initialproduks: produk[];
 };
 
-export default function ProdukTable({ initialproduks }: Props) {
-  const [produks, setproduks] = useState<Produk[]>(initialproduks);
+export default function produkTable({ initialproduks }: Props) {
+  const [produks, setproduks] = useState<produk[]>(initialproduks);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({
     name: "",
@@ -44,7 +44,7 @@ export default function ProdukTable({ initialproduks }: Props) {
         throw new Error(data.message || "Gagal menambahkan produk");
       }
 
-      const newproduk: Produk = await res.json();
+      const newproduk: produk = await res.json();
       setproduks((prev) => [newproduk, ...prev]);
 
       setForm({
@@ -69,7 +69,7 @@ export default function ProdukTable({ initialproduks }: Props) {
   return (
     <div className="space-y-6">
       <div className="bg-white border rounded-xl shadow-sm p-4">
-        <h2 className="text-sm font-semibold mb-3">Tambah Produk</h2>
+        <h2 className="text-sm font-semibold mb-3">Tambah produk</h2>
         <form onSubmit={handleSubmit} className="grid gap-3 md:grid-cols-2">
           <input
             type="text"
@@ -121,7 +121,7 @@ export default function ProdukTable({ initialproduks }: Props) {
             disabled={isSubmitting}
             className="md:col-span-2 bg-orange-500 text-white py-2 rounded-md"
           >
-            {isSubmitting ? "Menyimpan..." : "Simpan Produk"}
+            {isSubmitting ? "Menyimpan..." : "Simpan produk"}
           </button>
         </form>
       </div>
