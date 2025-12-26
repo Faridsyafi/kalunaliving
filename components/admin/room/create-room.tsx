@@ -1,5 +1,5 @@
 import React from "react";
-import CreateForm from "@/components/admin/products/create-form";
+import CreateForm from "@/components/admin/room/create-form";
 import { getAmenities } from "@/lib/data";
 
 const Createproduk = async () => {
