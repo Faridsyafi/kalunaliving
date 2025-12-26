@@ -23,22 +23,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.username || !credentials?.password) {
+        // ✅ paksa jadi string agar tidak terbaca "{}" oleh TypeScript
+        const username = String(credentials?.username ?? "");
+        const password = String(credentials?.password ?? "");
+
+        if (!username || !password) {
           throw new Error("Username dan password wajib diisi");
         }
 
         const user = await prisma.user.findUnique({
-          where: { username: credentials.username },
+          where: { username },
         });
 
         if (!user) {
           throw new Error("Username atau password salah");
         }
 
-        const isValid = await bcrypt.compare(
-          credentials.password,
-          user.password
-        );
+        const isValid = await bcrypt.compare(password, user.password);
 
         if (!isValid) {
           throw new Error("Username atau password salah");
