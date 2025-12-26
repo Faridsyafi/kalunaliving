@@ -1,20 +1,38 @@
 "use client";
+
 import Image from "next/image";
 import { useRef, useState, useTransition } from "react";
-import { type PutBlobResult } from "@vercel/blob";
+import type { PutBlobResult } from "@vercel/blob";
 import { IoCloudUploadOutline, IoTrashOutline } from "react-icons/io5";
 import { useActionState } from "react";
-import { Amenities } from "@prisma/client";
 import { BarLoader } from "react-spinners";
 import { updateproduk } from "@/lib/actions";
-import { produkProps } from "@/types/produk";
 import clsx from "clsx";
+
+// ✅ Deploy-safe type: hilangkan import "@/types/produk" yang tidak ada
+type produkProps = {
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+  capacity: number | string;
+  price: number | string;
+  produkAmenities: Array<{
+    amenitiesId: string;
+  }>;
+};
+
+// ✅ Deploy-safe type untuk amenities: pakai shape minimal yang dipakai di UI
+type AmenityLike = {
+  id: string;
+  name: string;
+};
 
 const EditForm = ({
   amenities,
   produk,
 }: {
-  amenities: Amenities[];
+  amenities: AmenityLike[];
   produk: produkProps;
 }) => {
   const inputFileRef = useRef<HTMLInputElement>(null);
@@ -27,6 +45,7 @@ const EditForm = ({
     const file = inputFileRef.current.files[0];
     const formData = new FormData();
     formData.set("file", file);
+
     startTransition(async () => {
       try {
         const response = await fetch("/api/upload", {
@@ -34,9 +53,12 @@ const EditForm = ({
           body: formData,
         });
         const data = await response.json();
+
         if (response.status !== 200) {
           setMessage(data.message);
+          return;
         }
+
         const img = data as PutBlobResult;
         setImage(img.url);
       } catch (error) {
@@ -45,10 +67,10 @@ const EditForm = ({
     });
   };
 
-  const deleteImage = (image: string) => {
+  const deleteImage = (imageUrl: string) => {
     startTransition(async () => {
       try {
-        await fetch(`/api/upload/?imageUrl=${image}`, {
+        await fetch(`/api/upload/?imageUrl=${encodeURIComponent(imageUrl)}`, {
           method: "DELETE",
         });
         setImage("");
@@ -62,7 +84,10 @@ const EditForm = ({
     updateproduk.bind(null, image, produk.id),
     null
   );
-  const checkedAmenities = produk.produkAmenities.map((item) => item.amenitiesId);
+
+  const checkedAmenities = (produk.produkAmenities ?? []).map(
+    (item) => item.amenitiesId
+  );
 
   return (
     <form action={formAction}>
@@ -83,6 +108,7 @@ const EditForm = ({
               </span>
             </div>
           </div>
+
           {/* description */}
           <div className="mb-4">
             <textarea
@@ -91,13 +117,14 @@ const EditForm = ({
               defaultValue={produk.description}
               className="py-2 px-4 rounded-sm border border-gray-400 w-full"
               rows={8}
-            ></textarea>
+            />
             <div aria-live="polite" aria-atomic="true">
               <span className="text-sm text-red-500 mt-2">
                 {state?.error?.description}
               </span>
             </div>
           </div>
+
           {/* Amenities */}
           <div className="mb-4 grid md:grid-cols-3">
             {amenities.map((item) => (
@@ -122,6 +149,7 @@ const EditForm = ({
           </div>
           {/* End Amenities */}
         </div>
+
         <div className="col-span-4 bg-white p-4">
           {/* Image Upload */}
           <label
@@ -130,6 +158,7 @@ const EditForm = ({
           >
             <div className="flex flex-col items-center justify-center text-gray-500 pt-5 pb-6 z-10">
               {pending ? <BarLoader /> : null}
+
               {image ? (
                 <button
                   type="button"
@@ -152,6 +181,7 @@ const EditForm = ({
                 </div>
               )}
             </div>
+
             {!image ? (
               <input
                 ref={inputFileRef}
@@ -170,6 +200,7 @@ const EditForm = ({
               />
             )}
           </label>
+
           {/* Capacity */}
           <div className="mb-4">
             <input
@@ -185,6 +216,7 @@ const EditForm = ({
               </span>
             </div>
           </div>
+
           {/* Price */}
           <div className="mb-4">
             <input
@@ -200,6 +232,7 @@ const EditForm = ({
               </span>
             </div>
           </div>
+
           {/* general message */}
           {state?.message ? (
             <div className="mb-4 bg-red-200 p-2">
@@ -208,7 +241,7 @@ const EditForm = ({
               </span>
             </div>
           ) : null}
-          {/* end general message */}
+
           {/* Submit Button */}
           <button
             type="submit"
