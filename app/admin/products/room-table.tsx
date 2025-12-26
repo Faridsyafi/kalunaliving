@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import type { produk } from "@prisma/client";
+import type { Produk } from "@prisma/client";
 
 type Props = {
-  initialproduks: produk[];
+  initialproduks: Produk[];
 };
 
-export default function produkTable({ initialproduks }: Props) {
-  const [produks, setproduks] = useState<produk[]>(initialproduks);
+export default function ProdukTable({ initialproduks }: Props) {
+  const [produks, setproduks] = useState<Produk[]>(initialproduks);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({
     name: "",
@@ -30,9 +30,7 @@ export default function produkTable({ initialproduks }: Props) {
       fd.append("description", form.description);
       fd.append("price", form.price);
       fd.append("capacity", form.capacity);
-      if (imageFile) {
-        fd.append("image", imageFile);
-      }
+      if (imageFile) fd.append("image", imageFile);
 
       const res = await fetch("/api/admin/produks", {
         method: "POST",
@@ -44,15 +42,10 @@ export default function produkTable({ initialproduks }: Props) {
         throw new Error(data.message || "Gagal menambahkan produk");
       }
 
-      const newproduk: produk = await res.json();
+      const newproduk: Produk = await res.json();
       setproduks((prev) => [newproduk, ...prev]);
 
-      setForm({
-        name: "",
-        description: "",
-        price: "",
-        capacity: "1",
-      });
+      setForm({ name: "", description: "", price: "", capacity: "1" });
       setImageFile(null);
 
       const fileInput = document.getElementById(
@@ -70,6 +63,7 @@ export default function produkTable({ initialproduks }: Props) {
     <div className="space-y-6">
       <div className="bg-white border rounded-xl shadow-sm p-4">
         <h2 className="text-sm font-semibold mb-3">Tambah produk</h2>
+
         <form onSubmit={handleSubmit} className="grid gap-3 md:grid-cols-2">
           <input
             type="text"
@@ -79,6 +73,7 @@ export default function produkTable({ initialproduks }: Props) {
             className="border px-3 py-2 rounded-md"
             required
           />
+
           <input
             type="text"
             placeholder="Harga"
@@ -87,6 +82,7 @@ export default function produkTable({ initialproduks }: Props) {
             className="border px-3 py-2 rounded-md"
             required
           />
+
           <input
             type="number"
             placeholder="Kapasitas"
@@ -95,15 +91,15 @@ export default function produkTable({ initialproduks }: Props) {
             className="border px-3 py-2 rounded-md"
             min={1}
           />
+
           <input
             id="produk-image-input"
             type="file"
             accept="image/*"
-            onChange={(e) =>
-              setImageFile(e.target.files?.[0] ?? null)
-            }
+            onChange={(e) => setImageFile(e.target.files?.[0] ?? null)}
             className="border px-3 py-2 rounded-md"
           />
+
           <textarea
             placeholder="Deskripsi"
             value={form.description}
@@ -113,9 +109,11 @@ export default function produkTable({ initialproduks }: Props) {
             className="border px-3 py-2 rounded-md md:col-span-2"
             required
           />
+
           {error && (
             <div className="md:col-span-2 text-sm text-red-500">{error}</div>
           )}
+
           <button
             type="submit"
             disabled={isSubmitting}
