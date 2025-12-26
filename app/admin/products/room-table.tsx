@@ -36,7 +36,7 @@ export default function ProdukTable({ initialproduks }: Props) {
         method: "POST",
         body: fd,
       });
-
+      
       if (!res.ok) {
         const data = await res.json().catch(() => ({} as any));
         throw new Error(data.message || "Gagal menambahkan produk");
