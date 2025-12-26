@@ -1,11 +1,11 @@
-// app/admin/produks/[id]/EditProdukClient.tsx
+// app/admin/produks/[id]/EditprodukClient.tsx
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-type ProdukItem = {
+type produkItem = {
   id: string;
   name: string;
   price: number;
@@ -16,10 +16,10 @@ type ProdukItem = {
 };
 
 type Props = {
-  produk: ProdukItem;
+  produk: produkItem;
 };
 
-export default function EditProdukClient({ produk }: Props) {
+export default function EditprodukClient({ produk }: Props) {
   const router = useRouter();
 
   const [preview, setPreview] = useState<string | null>(
@@ -138,14 +138,14 @@ export default function EditProdukClient({ produk }: Props) {
   return (
     <div className="border rounded-lg bg-white p-4 space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Edit / Hapus Produk</h2>
+        <h2 className="text-lg font-semibold">Edit / Hapus produk</h2>
         <button
           type="button"
           onClick={handleDelete}
           disabled={deleting}
           className="text-sm px-3 py-1.5 rounded bg-red-600 text-white hover:bg-red-700 disabled:opacity-60"
         >
-          {deleting ? "Menghapus..." : "Hapus Produk"}
+          {deleting ? "Menghapus..." : "Hapus produk"}
         </button>
       </div>
 
@@ -163,7 +163,7 @@ export default function EditProdukClient({ produk }: Props) {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-1">Nama Produk</label>
+          <label className="block text-sm font-medium mb-1">Nama produk</label>
           <input
             type="text"
             name="name"
